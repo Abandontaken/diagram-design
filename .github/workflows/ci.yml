@@ -52,6 +52,12 @@ jobs:
       - name: Verify OpenAI plugin directory listing and upload ZIP
         run: python3 scripts/test-build-openai-plugin-zip.py
 
+      - name: Verify Claude Desktop skill ZIP
+        run: python3 scripts/test-build-claude-skill-zip.py
+
+      - name: Check Claude Desktop skill ZIP limits
+        run: python3 scripts/build-claude-skill-zip.py --check
+
       # Versions are bumped on main by the Auto Version Bump workflow after
       # each merge (ADR 0009); pull requests must leave them untouched.
       # A pull_request checkout is GitHub's merge of the PR into the current
@@ -508,6 +514,16 @@ jobs:
         id: arc_diagram_tests
         run: python scripts/test-verify-arc-diagram.py
 
+      - name: Verify git-graph lane and merge geometry
+        if: always()
+        id: git_graph
+        run: python scripts/verify-git-graph.py --all
+
+      - name: Verify git-graph checker
+        if: always()
+        id: git_graph_tests
+        run: python scripts/test-verify-git-graph.py
+
       - name: Verify quoted CSS data is not read as geometry
         if: always()
         id: css_string_scan
@@ -717,6 +733,8 @@ jobs:
           echo "| Box-Plot Checker | ${{ steps.box_plot_tests.outcome == 'success' && '✅ Passed' || (steps.box_plot_tests.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Arc-Diagram Span Geometry | ${{ steps.arc_diagram.outcome == 'success' && '✅ Passed' || (steps.arc_diagram.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Arc-Diagram Checker | ${{ steps.arc_diagram_tests.outcome == 'success' && '✅ Passed' || (steps.arc_diagram_tests.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Git-Graph Lane & Merge Geometry | ${{ steps.git_graph.outcome == 'success' && '✅ Passed' || (steps.git_graph.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Git-Graph Checker | ${{ steps.git_graph_tests.outcome == 'success' && '✅ Passed' || (steps.git_graph_tests.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Quoted CSS Data Scan | ${{ steps.css_string_scan.outcome == 'success' && '✅ Passed' || (steps.css_string_scan.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Architecture Delta Snapshots & Ledger | ${{ steps.architecture_delta.outcome == 'success' && '✅ Passed' || (steps.architecture_delta.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Architecture Delta Checker | ${{ steps.architecture_delta_tests.outcome == 'success' && '✅ Passed' || (steps.architecture_delta_tests.outcome == 'skipped' && '⏭️ Skipped' || '❌ Failed') }} |" >> "$GITHUB_STEP_SUMMARY"
